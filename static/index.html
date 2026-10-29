@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nexora - Video HD untuk TikTok</title>
+<style>
+  :root {
+    --text: #fff6dc; --muted: rgba(255,246,220,.66);
+    --glass: rgba(255,190,40,.05); --glass-strong: rgba(255,190,40,.12);
+    --border: rgba(250,204,21,.2); --gold: #fbbf24; --gold2: #d97706;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  ::selection { background: rgba(251,191,36,.35); }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    color: var(--text); background: #000; min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 22px 16px 60px; }
+  .glass { background: linear-gradient(135deg, var(--glass-strong), var(--glass));
+    border: 1px solid var(--border); border-radius: 24px; padding: 22px; margin-top: 18px;
+    box-shadow: 0 14px 36px rgba(0,0,0,.6); }
+  header.glass { margin-top: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .logo { font-size: 21px; font-weight: 700; background: linear-gradient(90deg, #fff6dc, var(--gold), var(--gold2));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tag { font-size: 12px; color: var(--muted); padding: 6px 12px; border-radius: 999px; background: var(--glass); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 6vw, 32px); font-weight: 700; margin: 24px 0 8px; }
+  h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  p { color: var(--muted); font-size: 15px; }
+  .drop { display: block; border: 1.5px dashed var(--border); border-radius: 20px; padding: 30px 16px; text-align: center;
+    cursor: pointer; background: rgba(255,190,40,.03); transition: background .3s, transform .3s cubic-bezier(.2,.8,.2,1); }
+  .drop:hover { background: var(--glass-strong); transform: scale(1.01); }
+  .drop input { display: none; }
+  .drop .icon { font-size: 32px; margin-bottom: 6px; }
+  .drop small { color: var(--muted); }
+  .picked { margin-top: 12px; font-size: 13px; color: var(--muted); word-break: break-all; }
+  .label { font-size: 13px; color: var(--muted); margin: 16px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip input { display: none; }
+  .chip span { display: inline-block; padding: 9px 15px; border-radius: 999px; font-size: 14px;
+    background: var(--glass); border: 1px solid var(--border); cursor: pointer;
+    transition: background .35s ease, color .35s ease, box-shadow .35s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
+  .chip span:active { transform: scale(.94); }
+  .chip input:checked + span { background: linear-gradient(135deg, #fde68a, #fbbf24); color: #140c00; font-weight: 600; border-color: transparent; }
+  .btn { display: block; width: 100%; margin-top: 18px; padding: 15px; border-radius: 18px; text-align: center; border: none;
+    font-weight: 700; font-size: 16px; text-decoration: none; cursor: pointer; color: #140c00;
+    background: linear-gradient(135deg, #fde68a, #fbbf24); box-shadow: 0 10px 28px rgba(251,191,36,.25);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), opacity .25s; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .btn.dark { background: rgba(255,190,40,.08); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+  .hidden { display: none !important; }
+  .progress { height: 10px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 16px; }
+  .progress > div { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--gold), var(--gold2)); transition: width .4s linear; }
+  .status { font-size: 14px; color: var(--muted); margin-top: 12px; text-align: center; min-height: 20px; }
+  .error { color: #f87171; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  footer { text-align: center; margin-top: 28px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="glass">
+    <div class="logo">Nexora</div>
+    <div class="tag">Video HD untuk TikTok</div>
+  </header>
+
+  <h1>Pilih video, lalu siap upload</h1>
+  <p>Video diekspor di server dengan H.264 High dan 60 fps. Setelah selesai, unduh dan unggah ke TikTok Studio.</p>
+
+  <div class="glass">
+    <h2>1. Pilih video</h2>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept="video/*">
+      <div class="icon">🎬</div>
+      <div>Klik untuk memilih video</div>
+      <small>MP4, MOV, M4V, WebM · maksimal 200 MB · maksimal 90 detik</small>
+    </label>
+    <div class="picked" id="picked"></div>
+  </div>
+
+  <div class="glass">
+    <h2>2. Pilih kualitas</h2>
+    <div class="label">Resolusi</div>
+    <div class="chips" id="resGroup">
+      <label class="chip"><input type="radio" name="res" value="1080" checked><span>1080p</span></label>
+      <label class="chip"><input type="radio" name="res" value="1440"><span>1440p (2K)</span></label>
+    </div>
+    <div class="label">Frame rate</div>
+    <div class="chips" id="fpsGroup">
+      <label class="chip"><input type="radio" name="fps" value="60" checked><span>60 fps</span></label>
+      <label class="chip"><input type="radio" name="fps" value="30"><span>30 fps</span></label>
+    </div>
+    <button class="btn" id="go" disabled>Proses video</button>
+    <div class="progress hidden" id="bar"><div id="barFill"></div></div>
+    <div class="status" id="status"></div>
+    <a class="btn hidden" id="download" href="#" download>Simpan video hasil</a>
+    <a class="btn dark" id="toTiktok" href="https://www.tiktok.com/tiktokstudio/upload" target="_blank" rel="noopener">Buka TikTok Studio ↗</a>
+    <div class="note">Proses bisa beberapa menit tergantung panjang video dan antrean. Biarkan halaman tetap terbuka.</div>
+  </div>
+
+  <footer>Nexora · Versi gratis dengan batas ukuran dan durasi.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fileInput = $('file'), picked = $('picked'), go = $('go');
+const bar = $('bar'), barFill = $('barFill'), statusEl = $('status'), dl = $('download');
+let pollTimer = null;
+
+fileInput.addEventListener('change', () => {
+  const f = fileInput.files[0];
+  if (!f) return;
+  picked.textContent = `${f.name} · ${(f.size / 1024 / 1024).toFixed(1)} MB`;
+  go.disabled = false;
+  dl.classList.add('hidden');
+  setStatus('');
+});
+
+function setStatus(text, isError = false) {
+  statusEl.textContent = text;
+  statusEl.classList.toggle('error', isError);
+}
+
+go.addEventListener('click', async () => {
+  const f = fileInput.files[0];
+  if (!f) return;
+  const res = document.querySelector('input[name="res"]:checked').value;
+  const fps = document.querySelector('input[name="fps"]:checked').value;
+
+  const fd = new FormData();
+  fd.append('file', f);
+  fd.append('res', res);
+  fd.append('fps', fps);
+
+  go.disabled = true;
+  dl.classList.add('hidden');
+  bar.classList.remove('hidden');
+  barFill.style.width = '0%';
+  setStatus('Mengunggah video...');
+
+  try {
+    const r = await fetch('/api/jobs', { method: 'POST', body: fd });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || 'Gagal mengunggah video.');
+    poll(data.id, res, fps);
+  } catch (err) {
+    setStatus(err instanceof TypeError
+      ? 'Server tidak bisa dihubungi. Buka halaman ini dari alamat server (misalnya https://nama-kamu.onrender.com), bukan dari file.'
+      : err.message, true);
+    bar.classList.add('hidden');
+    go.disabled = false;
+  }
+});
+
+function poll(id, res, fps) {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    try {
+      const r = await fetch(`/api/jobs/${id}`);
+      if (!r.ok) throw new Error('Job tidak ditemukan. Coba proses ulang.');
+      const j = await r.json();
+      if (j.status === 'queued') {
+        setStatus('Menunggu giliran...');
+      } else if (j.status === 'processing') {
+        barFill.style.width = j.progress + '%';
+        setStatus(`Memproses ${j.progress}%`);
+      } else if (j.status === 'done') {
+        clearInterval(pollTimer);
+        barFill.style.width = '100%';
+        dl.href = `/api/jobs/${id}/download`;
+        dl.download = `nexora-${res}p-${fps}fps.mp4`;
+        dl.classList.remove('hidden');
+        setStatus('Selesai! Unduh video lalu unggah ke TikTok Studio.');
+        go.disabled = false;
+      } else if (j.status === 'error') {
+        clearInterval(pollTimer);
+        setStatus('Gagal memproses: ' + (j.error || 'kesalahan tidak diketahui'), true);
+        go.disabled = false;
+      }
+    } catch (err) {
+      clearInterval(pollTimer);
+      setStatus(err.message, true);
+      go.disabled = false;
+    }
+  }, 1500);
+}
+</script>
+</body>
+</html>
